@@ -164,6 +164,580 @@ namespace Data.CLM
 
         #region Return
 
+        /// <summary>
+        /// Returns a specified CLM entry and its associated case data
+        /// </summary>
+        /// <param name="provider">The connection string to the data source</param>
+        /// <param name="accountingCaseId">The uniwue idenfitier for the CLM entry</param>
+        /// <returns></returns>
+        public DataTable ReturnCLMEntry(string provider, int accountingCaseId)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@AccountingCaseId", SqlDbType.Int);
+            myParam.Value = accountingCaseId;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMEntry ");
+        }
+
+        /// <summary>
+        /// Returns the case currently assigned to the user
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <returns></returns>
+        /// <remarks>This methods assumes that a user will only ever be assigned one entry at a time (i.e. not one per pool
+        /// and\or organisational unit</remarks>
+        public DataTable ReturnAssignedCase(string provider)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, "ReturnCLMNextAssignedCase ");
+        }
+
+        /// <summary>
+        /// Returns the case currently assigned to the user (but not worked) in the specified pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="pool">The pool that the work is assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnAssignedCase(string provider, string pool)
+        {
+            return ReturnAssignedCase(provider, null, pool);
+        }
+
+        /// <summary>
+        /// Returns the case currently assigned to the user (but not worked) in the specified organisational unit\pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the case must relate to (optional)</param>
+        /// <param name="pool">The pool that the work is assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnAssignedCase(string provider, string organisationalUnit, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMNextAssignedEntryByUnitAndPool"); 
+        }
+
+        //TODO add other options for viewing current users cases
+        
+        /// <summary>
+        /// Returns all of the oustanding CLM entries
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntries(string provider)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, "ReturnCLMOutstandingEntriesAll");
+        }
+
+        /// <summary>
+        /// Returns the oustanding entries for a specified organisational unit
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the entries must relate to</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByUnit(string provider, string organisationalUnit)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnit");
+        }
+
+        /// <summary>
+        /// Return the outstanding cases in the specified unit\pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that cases must relate to</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByUnitAndPool(string provider, string organisationalUnit, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnitAndPool");
+        }
+
+        /// <summary>
+        /// Returns the outstanding entries in the specified pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data sourc</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByPool(string provider, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInPool");
+        }
+
+        /// <summary>
+        /// Returns the unassigned cases in the specified organisational unit
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases must relate to</param>
+        /// <returns></returns>
+        public DataTable ReturnUnassignedEntriesByUnit(string provider, string organisationalUnit)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOUnassignedEntriesInOrganisationalUnit");
+        }
+
+        /// <summary>
+        /// Returns the unassigned cases in a specified unit\pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The origanisational unit that cases must relate to</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnUnassignedEntriesByUnitAndPool(string provider, string organisationalUnit, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMUnassignedEntriesInOrganisationalUnitAndPool");
+        }
+
+        /// <summary>
+        /// Returns the unassigned cases in the specified pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="pool">The pool that cases have been assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnUnassignedEntriesByPool(string provider, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMUnassignedEntriesInPool");
+        }
+
+        public DataTable ReturnOutstandingEntries(string provider, string organisationalUnit, DateTime dateAssigned)
+        {
+            return ReturnOutstandingEntries(provider, organisationalUnit, dateAssigned, dateAssigned);
+        }
+
+        /// <summary>
+        /// Returns the cases assigned to users in a specified date range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that cases must relate to</param>
+        /// <param name="dateAssignedStart">The start of the date range</param>
+        /// <param name="dateAssignedEnd">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntries(string provider, string organisationalUnit, DateTime dateAssignedStart, DateTime dateAssignedEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@StartOfRange", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndOfRange", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnitByDateAssignedToUser");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the specified unit\pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases are assigned to</param>
+        /// <param name="pool">The pool that cases have been assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntries(string provider, string organisationalUnit, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnitAndPool");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases that were assigned to the specified unit\pool on the specified date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases were assigned to</param>
+        /// <param name="pool">The pool that the cases were assigned to</param>
+        /// <param name="dateAssigned">The date that the cases were assigned</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByDateAssignedToPool(string provider, string organisationalUnit, string pool, DateTime dateAssigned)
+        {
+            return ReturnOutstandingEntriesByDateAssignedToPool(provider, organisationalUnit, pool, dateAssigned, dateAssigned);
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases that were assigned to the specified unit\pool in the specified date range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organsiational unit that the cases were assigned to</param>
+        /// <param name="pool">The pool that the cases were assigned to</param>
+        /// <param name="dateAssignedToPoolStart">The start of the date range</param>
+        /// <param name="dateAssignedToPoolEnd">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByDateAssignedToPool(string provider, string organisationalUnit, string pool, DateTime dateAssignedToPoolStart, DateTime dateAssignedToPoolEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedToPoolStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedToPoolEnd.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnitAndPoolByDateAssignedToPool");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to users in the specified unit\pool on the specified date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases were assigned to</param>
+        /// <param name="pool">The pool that cases were assigned to</param>
+        /// <param name="dateAssignedToUser">The date that the cases were assigned to users</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByDateAssignedToUser(string provider, string organisationalUnit, string pool, DateTime dateAssignedToUser)
+        {
+            return ReturnOutstandingEntriesByDateAssignedToUser(provider, organisationalUnit, pool, dateAssignedToUser, dateAssignedToUser);
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to users in the specified unit\pool in the specified date range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases were assigned to</param>
+        /// <param name="pool">The pool that cases were assigned to</param>
+        /// <param name="startDate">The start of the date range</param>
+        /// <param name="endDate">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByDateAssignedToUser(string provider, string organisationalUnit, string pool, DateTime startDate, DateTime endDate)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = startDate.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            myParam.Value = startDate.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnitAndPoolByDateAssignedToUser");
+        }
+
+        /// <summary>
+        /// Returns the cases assigned to the specified unit that relate to cases with the specified date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases are assigned to</param>
+        /// <param name="dateOfCase">The date that the cases must relate to</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByCaseDate(string provider, string organisationalUnit, DateTime dateOfCase)
+        {
+            return ReturnOutstandingEntriesByCaseDate(provider, organisationalUnit, dateOfCase, dateOfCase);
+        }
+
+        /// <summary>
+        /// Returns the cases assigned to the specified unit that relate to cases in the spcified date range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organsiational unit that the cases must relate to</param>
+        /// <param name="dateOfCaseStart">The start of the date range</param>
+        /// <param name="dateofCaseEnd">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByCaseDate(string provider, string organisationalUnit, DateTime dateOfCaseStart, DateTime dateofCaseEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = dateOfCaseStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            myParam.Value = dateofCaseEnd.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnitByDateOfCase");
+        }
+
+        /// <summary>
+        /// Returns the cases assigned to the specified unit\pool where the date of the case matches the specified date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases are assigned to</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <param name="dateAssigned">The date that the cases must relate to</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByCaseDate(string provider, string organisationalUnit, string pool, DateTime dateAssigned)
+        {
+            return ReturnOutstandingEntriesByCaseDate(provider, organisationalUnit, pool, dateAssigned, dateAssigned);
+        }
+
+        /// <summary>
+        /// Returns the cases assigned to the specified unit\pool where the date of the case is in the specified range
+        /// </summary>
+        /// <param name="provider">The connection  string for the data sourceparam>
+        /// <param name="organisationalUnit">The organisational unit that the cases relate to</param>
+        /// <param name="pool">The pool that the cases relate to</param>
+        /// <param name="dateAssignedStart">The start of the range</param>
+        /// <param name="dateAssignedEnd">The end of the range</param>
+        /// <returns></returns>
+        public DataTable ReturnOutstandingEntriesByCaseDate(string provider, string organisationalUnit, string pool, DateTime dateAssignedStart, DateTime dateAssignedEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedEnd.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMOutstandingEntriesInOrganisationalUnitAndPoolByDateOfCase");
+        }
+
+        /// <summary>
+        /// Returns the cases assigned to the current user
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCases(string provider)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, "ReturnCLMMyCases");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the current user
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCases(string provider, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMMyCasesByPool");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the current user in the specified unit\pool
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases are assigned to</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCases(string provider, string organisationalUnit, string pool)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMMyCasesByUnitAndPool");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the current user on the specified date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="dateAssigned">The date that the work was assigned to the user</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByDateAssigned(string provider, DateTime dateAssigned)
+        {
+            return ReturnMyCasesByDateAssigned(provider, dateAssigned, dateAssigned);
+        }
+
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the current user in the specified date range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="dateAssignedStart">The start of the date range</param>
+        /// <param name="dateAssignedEnd">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByDateAssigned(string provider, DateTime dateAssignedStart, DateTime dateAssignedEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedStart.ToString("yyyyMMdddd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            myParam.Value = dateAssignedEnd.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMMyCasesByDateAssigned");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the current user where the case date is on the specified date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="dateOfCase">The date that the cases must relate to/param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByCaseDate(string provider, DateTime dateOfCase)
+        {
+            return ReturnMyCasesByCaseDate(provider, dateOfCase, dateOfCase);
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the current user where the case date is in the specified range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="dateOfCaseStart">The start of the date range</param>
+        /// <param name="dateOfCaseEnd">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByCaseDate(string provider, DateTime dateOfCaseStart, DateTime dateOfCaseEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = dateOfCaseStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            myParam.Value = dateOfCaseEnd.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMMyCasesByDateOfCase");
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases for the current user which are assigned to the specified unit and have the specified 
+        /// case date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that cases must be assigned to</param>
+        /// <param name="dateOfCase">The date that the cases must match</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByCaseDate(string provider, string organisationalUnit, DateTime dateOfCase)
+        {
+            return ReturnMyCasesByCaseDate(provider, organisationalUnit, dateOfCase, dateOfCase);        }
+
+        /// <summary>
+        /// Returns the outstanding cases for the current user which are assigned to the specified unit and are within the 
+        /// specified date range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that cases must be assigned to</param>
+        /// <param name="dateOfCaseStart">The start of the date range</param>
+        /// <param name="dateOfCaseEnd">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByCaseDate(string provider, string organisationalUnit, DateTime dateOfCaseStart,DateTime dateOfCaseEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = dateOfCaseStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            myParam.Value = dateOfCaseEnd.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMMyCasesByUnitAndDateOfCase");
+        }
+
+        /// <summary>
+        /// Returns outstanding cases assigned to the current user and in the specified unit\pool where the date of the case
+        /// matches the specified date
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases are assigned to</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <param name="dateOfCase">The date that the cases must relate to</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByCaseDate(string provider, string organisationalUnit, string pool, DateTime dateOfCase)
+        {
+            return ReturnMyCasesByCaseDate(provider, organisationalUnit, pool, dateOfCase, dateOfCase);
+        }
+
+        /// <summary>
+        /// Returns the outstanding cases assigned to the current user and in the specified unit\pool where the date of the
+        /// case in in the specified date range
+        /// </summary>
+        /// <param name="provider">The connection string for the data source</param>
+        /// <param name="organisationalUnit">The organisational unit that the cases are assigned to</param>
+        /// <param name="pool">The pool that the cases are assigned to</param>
+        /// <param name="dateOfCaseStart">The start of the date range</param>
+        /// <param name="dateOfCaseEnd">The end of the date range</param>
+        /// <returns></returns>
+        public DataTable ReturnMyCasesByCaseDate(string provider, string organisationalUnit, string pool, DateTime dateOfCaseStart, DateTime dateOfCaseEnd)
+        {
+            New_Wrapper.DataHandler myHandler = new New_Wrapper.DataHandler();
+            List<SqlParameter> paramArray = new List<SqlParameter>();
+            SqlParameter myParam = new SqlParameter("@OrganisationalUnit", SqlDbType.NVarChar, 50);
+            myParam.Value = organisationalUnit;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@Pool", SqlDbType.NVarChar, 50);
+            myParam.Value = pool;
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@StartDate", SqlDbType.NChar, 8);
+            myParam.Value = dateOfCaseStart.ToString("yyyyMMdd");
+            paramArray.Add(myParam);
+            myParam = new SqlParameter("@EndDate", SqlDbType.NChar, 8);
+            paramArray.Add(myParam);
+            return myHandler.RunStoredProcedureAndReturnSingleTable(provider, ref paramArray, "ReturnCLMMyCasesByUnitPoolAndDateOfCase");
+        }
+
         #endregion
 
         #region Update
